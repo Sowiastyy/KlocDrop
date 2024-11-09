@@ -6,6 +6,15 @@ require("game")
 require("input")
 menu = require("menu")
 crashHandler = require("crash_handler") -- Dodajemy crash handler
+baseWidth = 640
+baseHeight = 960
+local scaleX, scaleY
+function updateScale()
+    local screenWidth = love.graphics.getWidth()
+    local screenHeight = love.graphics.getHeight()
+    scaleX = screenWidth / baseWidth
+    scaleY = screenHeight / baseHeight
+end
 
 function love.load()
     gameState = "menu"
@@ -13,7 +22,13 @@ function love.load()
     initGrid()
     initGame()
     initInput()
+    updateScale() -- Oblicz początkową skalę
 end
+
+function love.resize(w, h)
+    updateScale() -- Zaktualizuj skalę przy zmianie rozmiaru okna
+end
+
 
 function love.update(dt)
     crashHandler.setPosition("love.update") -- Ustawiamy pozycję
@@ -29,12 +44,15 @@ function love.update(dt)
 end
 
 function love.draw()
-    crashHandler.setPosition("love.draw") -- Ustawiamy pozycję
+    crashHandler.setPosition("love.draw")
     crashHandler.monitor(function()
+        love.graphics.push()
+        love.graphics.scale(scaleX, scaleY) -- Ustaw skalowanie
+
         if gameState == "menu" then
             menu.draw()
         elseif gameState == "game" then
-            local screenWidth = love.graphics.getWidth()
+            local screenWidth = baseWidth
             local gridWidth = 10 * blockSize
             local offsetX = (screenWidth - gridWidth) / 2
 
@@ -49,9 +67,12 @@ function love.draw()
             drawUI()
             drawButtons()
         end
-        crashHandler.draw() -- Rysowanie crash handlera, jeśli wystąpił błąd
+
+        crashHandler.draw()
+        love.graphics.pop() -- Przywróć poprzedni stan grafiki
     end)
 end
+
 
 function love.keypressed(key)
     crashHandler.setPosition("love.keypressed") -- Ustawiamy pozycję
@@ -74,30 +95,41 @@ function love.keyreleased(key)
 end
 
 function love.mousepressed(x, y, button, istouch)
-    crashHandler.setPosition("love.mousepressed") -- Ustawiamy pozycję
+    crashHandler.setPosition("love.mousepressed")
     crashHandler.monitor(function()
         if gameState == "menu" then
-            menu.mousepressed(x, y, button, istouch)
+            menu.mousepressed(x / scaleX, y / scaleY, button, istouch)
+        else
+            handleMousePressed(x / scaleX, y / scaleY, button)
+        end
+    end)
+end
+
+function love.mousereleased(x, y, button, istouch)
+    crashHandler.setPosition("love.mousereleased")
+    crashHandler.monitor(function()
+        if gameState == "game" then
+            handleMouseReleased(x / scaleX, y / scaleY, button, istouch)
         end
     end)
 end
 
 function love.touchpressed(id, x, y, dx, dy, pressure)
-    crashHandler.setPosition("love.touchpressed") -- Ustawiamy pozycję
+    crashHandler.setPosition("love.touchpressed")
     crashHandler.monitor(function()
         if gameState == "menu" then
-            menu.touchpressed(id, x, y, dx, dy, pressure)
+            menu.touchpressed(id, x / scaleX, y / scaleY, dx / scaleX, dy / scaleY, pressure)
         elseif gameState == "game" then
-            handleTouchPressed(id, x, y)
+            handleTouchPressed(id, x / scaleX, y / scaleY)
         end
     end)
 end
 
 function love.touchreleased(id, x, y, dx, dy, pressure)
-    crashHandler.setPosition("love.touchreleased") -- Ustawiamy pozycję
+    crashHandler.setPosition("love.touchreleased")
     crashHandler.monitor(function()
         if gameState == "game" then
-            handleTouchReleased(id, x, y)
+            handleTouchReleased(id, x / scaleX, y / scaleY)
         end
     end)
 end

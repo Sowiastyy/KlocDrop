@@ -25,18 +25,49 @@ function initInput()
     buttonImages["right"] = love.graphics.newImage("assets/buttons/right.png")
     buttonImages["softDrop"] = love.graphics.newImage("assets/buttons/softDrop.png")
 
-    -- Create button definitions with position and image
+    -- Create button definitions with position, image, and action
     buttons = {
-        {x = offset + buttonSpacing * 2 + buttonSize, y = yPosition + buttonSize + buttonSpacing, width = buttonSize, height = buttonSize, image = buttonImages["left"]},
-        {x = offset + buttonSpacing, y = yPosition + buttonSize + buttonSpacing, width = buttonSize, height = buttonSize, image = buttonImages["hardDrop"]},
-        {x = offset + buttonSpacing * 4 + 3 * buttonSize, y = yPosition, width = buttonSize, height = buttonSize, image = buttonImages["hold"]},
-        {x = offset + buttonSpacing * 3 + 2 * buttonSize, y = yPosition + buttonSize + buttonSpacing, width = buttonSize, height = buttonSize, image = buttonImages["right"]},
-        {x = offset + buttonSpacing * 4 + 3 * buttonSize, y = yPosition + buttonSize + buttonSpacing, width = buttonSize, height = buttonSize, image = buttonImages["softDrop"]},
-        {x = offset + buttonSpacing, y = yPosition, width = buttonSize, height = buttonSize, image = buttonImages["rotate90"]},
-        {x = offset + buttonSpacing * 2 + buttonSize, y = yPosition, width = buttonSize, height = buttonSize, image = buttonImages["rotate180"]},
-        {x = offset + buttonSpacing * 3 + 2 * buttonSize, y = yPosition, width = buttonSize, height = buttonSize, image = buttonImages["rotate270"]},
+        {x = offset + buttonSpacing * 2 + buttonSize, y = yPosition + buttonSize + buttonSpacing, width = buttonSize, height = buttonSize, image = buttonImages["left"], action = "left"},
+        {x = offset + buttonSpacing, y = yPosition + buttonSize + buttonSpacing, width = buttonSize, height = buttonSize, image = buttonImages["hardDrop"], action = "hardDrop"},
+        {x = offset + buttonSpacing * 4 + 3 * buttonSize, y = yPosition, width = buttonSize, height = buttonSize, image = buttonImages["hold"], action = "hold"},
+        {x = offset + buttonSpacing * 3 + 2 * buttonSize, y = yPosition + buttonSize + buttonSpacing, width = buttonSize, height = buttonSize, image = buttonImages["right"], action = "right"},
+        {x = offset + buttonSpacing * 4 + 3 * buttonSize, y = yPosition + buttonSize + buttonSpacing, width = buttonSize, height = buttonSize, image = buttonImages["softDrop"], action = "softDrop"},
+        {x = offset + buttonSpacing, y = yPosition, width = buttonSize, height = buttonSize, image = buttonImages["rotate90"], action = "rotate90"},
+        {x = offset + buttonSpacing * 2 + buttonSize, y = yPosition, width = buttonSize, height = buttonSize, image = buttonImages["rotate180"], action = "rotate180"},
+        {x = offset + buttonSpacing * 3 + 2 * buttonSize, y = yPosition, width = buttonSize, height = buttonSize, image = buttonImages["rotate270"], action = "rotate270"},
     }
 end
+
+function handleTouchPressed(id, x, y)
+    for _, button in pairs(buttons) do
+        if x >= button.x and x <= button.x + button.width and y >= button.y and y <= button.y + button.height then
+            executeAction(button.action, true)
+        end
+    end
+end
+
+function handleTouchReleased(id, x, y)
+    for _, button in pairs(buttons) do
+        if x >= button.x and x <= button.x + button.width and y >= button.y and y <= button.y + button.height then
+            executeAction(button.action, false)
+        end
+    end
+end
+function handleMouseReleased(x, y, button)
+    for _, button in pairs(buttons) do
+        if x >= button.x and x <= button.x + button.width and y >= button.y and y <= button.y + button.height then
+            executeAction(button.action, false)
+        end
+    end
+end
+function handleMousePressed(x, y, button)
+    for _, button in pairs(buttons) do
+        if x >= button.x and x <= button.x + button.width and y >= button.y and y <= button.y + button.height then
+            executeAction(button.action, true)
+        end
+    end
+end
+
 
 function drawButtons()
     love.graphics.setColor(1, 1, 1)
@@ -51,22 +82,6 @@ end
 
 function updateInput(dt)
     -- Możesz tutaj dodać logikę trzymania przycisków
-end
-
-function handleTouchPressed(id, x, y)
-    for action, button in pairs(buttons) do
-        if x >= button.x and x <= button.x + button.width and y >= button.y and y <= button.y + button.height then
-            executeAction(action, true)
-        end
-    end
-end
-
-function handleTouchReleased(id, x, y)
-    for action, button in pairs(buttons) do
-        if x >= button.x and x <= button.x + button.width and y >= button.y and y <= button.y + button.height then
-            executeAction(action, false)
-        end
-    end
 end
 
 function executeAction(action, isPressed)

@@ -2,7 +2,7 @@ local menu = {}
 
 function menu.load()
     -- Ładowanie nowej czcionki
-    menu.titleFont = love.graphics.newFont("assets/conform-f-s.ttf", 60) -- Podaj ścieżkę do nowej czcionki
+    menu.titleFont = love.graphics.newFont("assets/conform-f-s.ttf", 60)
     menu.optionFont = love.graphics.newFont("assets/conform-f-s.ttf", 40)
 
     menu.options = {"Start Game", "Options", "Exit"}
@@ -20,16 +20,16 @@ function menu.update(dt)
     -- Aktualizacja spadających klocków
     menu.updateFallingBlocks(dt)
 
-    -- Co jakiś czas generujemy nowy klocek
+    -- Co 0.7 sekundy generujemy nowy klocek
     menu.spawnTimer = menu.spawnTimer + dt
-    if menu.spawnTimer >= 1.5 then -- Nowy klocek co 1.5 sekundy
+    if menu.spawnTimer >= 0.7 then
         menu.spawnFallingBlock()
         menu.spawnTimer = 0
     end
 end
 
 function menu.draw()
-    love.graphics.setBackgroundColor(0.1, 0.1, 0.1) -- Ciemne tło
+    love.graphics.setBackgroundColor(0.1, 0.1, 0.1)
 
     -- Rysowanie spadających klocków
     menu.drawFallingBlocks()
@@ -39,11 +39,11 @@ function menu.draw()
 
     -- Rysowanie cienia tytułu
     love.graphics.setColor(0, 0, 0)
-    love.graphics.printf(menu.title, 2, 152, love.graphics.getWidth(), "center")
+    love.graphics.printf(menu.title, 2, 152, baseWidth, "center")
 
     -- Rysowanie głównego tytułu
     love.graphics.setColor(0, 0.8, 1)
-    love.graphics.printf(menu.title, 0, 150, love.graphics.getWidth(), "center")
+    love.graphics.printf(menu.title, 0, 150, baseWidth, "center")
 
     -- Ustawienie czcionki dla opcji menu
     love.graphics.setFont(menu.optionFont)
@@ -52,24 +52,35 @@ function menu.draw()
     for i, option in ipairs(menu.options) do
         local color = {1, 1, 1}
         if i == menu.selected then
-            color = {0.5, 0.8, 1} -- Podświetlona opcja
+            color = {0.5, 0.8, 1}
         end
         love.graphics.setColor(color)
-        love.graphics.printf(option, 0, menu.optionYPositions[i], love.graphics.getWidth(), "center")
+        love.graphics.printf(option, 0, menu.optionYPositions[i], baseWidth, "center")
     end
 end
 
 function menu.spawnFallingBlock()
     local blockTypes = {"I", "J", "L", "O", "S", "T", "Z"}
-    local blockType = blockTypes[math.random(#blockTypes)] -- Losowy typ klocka
-    local xPosition = math.random(0, love.graphics.getWidth() - blockSize * 2) -- Losowa pozycja X
-    local speed = math.random(30, 60) -- Losowa prędkość spadania
+    local colors = {
+        I = {0, 1, 1},
+        J = {0, 0, 1},
+        L = {1, 0.5, 0},
+        O = {1, 1, 0},
+        S = {0, 1, 0},
+        T = {0.5, 0, 0.5},
+        Z = {1, 0, 0},
+    }
+    local blockType = blockTypes[math.random(#blockTypes)]
+    local xPosition = math.random(0, baseWidth - blockSize * 2)
+    local speed = math.random(60, 100) -- Większa prędkość spadania
+    local color = colors[blockType]
 
     table.insert(menu.blocks, {
         type = blockType,
         x = xPosition,
-        y = -blockSize * 2, -- Start powyżej ekranu
-        speed = speed
+        y = -blockSize * 2,
+        speed = speed,
+        color = color
     })
 end
 
@@ -86,10 +97,9 @@ function menu.updateFallingBlocks(dt)
 end
 
 function menu.drawFallingBlocks()
-    love.graphics.setColor(0.5, 0.5, 0.5, 0.7) -- Szary, półprzezroczysty kolor
-
     for _, block in ipairs(menu.blocks) do
-        local shape = tetrominoes[block.type].shapes[1] -- Pierwsza rotacja tetromina
+        love.graphics.setColor(block.color) -- Używamy przypisanego koloru klocka
+        local shape = tetrominoes[block.type].shapes[1]
         for i = 1, #shape do
             for j = 1, #shape[i] do
                 if shape[i][j] == 1 then
@@ -136,11 +146,11 @@ end
 
 function menu.activateOption(selectedOption)
     if selectedOption == 1 then
-        gameState = "game" -- Start the game
+        gameState = "game"
     elseif selectedOption == 2 then
         gameState = "options"
     elseif selectedOption == 3 then
-        love.event.quit() -- Exit the game
+        love.event.quit()
     end
 end
 

@@ -407,11 +407,11 @@ function drawUI()
     love.graphics.print("Time\n" .. math.floor(gameTime), 10, uiYPosition - 80)
     -- Wyświetlanie napisu "NEXT" i następnych tetrominów
     love.graphics.setFont(smallFont)
-    love.graphics.print("NEXT", love.graphics.getWidth() - 120, 10)
+    love.graphics.print("NEXT", baseWidth - 120, 10)
     -- Wyświetlanie komunikatów na środku ekranu (jeśli istnieje)
     if message ~= "" then
         love.graphics.setColor(1, 1, 0)
-        love.graphics.printf(message, 0, 200, love.graphics.getWidth(), "center")
+        love.graphics.printf(message, 0, 200, baseWidth, "center")
         love.graphics.setColor(1, 1, 1)
     end
 
@@ -425,7 +425,7 @@ end
 
 function drawNextTetrominoes(scale)
     scale = scale or 1
-    local startX = love.graphics.getWidth() - 120
+    local startX = baseWidth - 120
     local startY = 50 + 30 -- Przesunięcie tetrominów nieco niżej
     local spacing = 120 -- Odstęp między tetrominami, dostosowany do powiększenia
 

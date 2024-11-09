@@ -12,12 +12,12 @@ function Tetromino:new(key)
     tet.x = 4
     tet.y = 0
     tet.lockDelay = 0
-    tet.lockDelayLimit = 0.5 -- Czas na wykonanie ruchów po dotknięciu podłoża
+    tet.lockDelayLimit = 0.1 -- Czas na wykonanie ruchów po dotknięciu podłoża
     return tet
 end
 
 function Tetromino:rotate(angle)
-    local oldRotation = self.rotation
+    local oldRotation = self.rotation              
     local rotationSteps = angle / 90
     self.rotation = (self.rotation - 1 + rotationSteps) % #self.shapes + 1
     if checkCollision(self) then
